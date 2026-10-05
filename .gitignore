@@ -1,0 +1,8 @@
+# Visual Studio 캐시와 사용자별 설정
+.vs/
+*.user
+
+# 빌드 산출물
+[Dd]ebug/
+[Rr]elease/
+x64/
