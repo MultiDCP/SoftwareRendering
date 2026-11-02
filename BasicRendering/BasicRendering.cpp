@@ -11,13 +11,6 @@
 *   원 그리는 법은 https://luckygg.tistory.com/90 ([GDI] Part 2. 작도함수 #1)의 함수들을 참고했다.
 */
 
-static BOOL bCollectPoints;
-static POINT ptMouseDown[32];
-static int index;
-POINTS ptTmp;
-RECT rc;
-HRGN hrgn;
-
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 // ? : 왜 빌드하면 Marker 식별자를 찾을 수 없다는 오류가 나는가?
@@ -90,6 +83,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static BOOL bCollectPoints;
+	static POINT ptMouseDown[32];
+	static int index;
+	POINTS ptTmp;
+	RECT rc;
+	HRGN hrgn;
+
 	// uMsg : 메세지 코드. wParam과 lParam을 통해 함수가 관련된 추가 데이터를 받을 수 있다.
 	switch (uMsg)
 	{
@@ -200,7 +200,9 @@ void Marker(LONG x, LONG y, HWND hwnd)
 
 	// 클릭 지점으로부터 (x-2,y-2)~(x+3,y+3)까지의 원형 그리기
 	// ? : 왜 (x-2,y-2)부터 (x+2,y+2)까지는 점이 원점에 더 치우쳐보이는가?
-	// 추정 : x-2 <= x < x+2 범위로 그려지는 것으로 추정된다.
+	// 해결 : Ellipse는 경계 사각형의 오른쪽과 아래쪽 가장자리를 제외하고 그린다.
+	//        (x-2)~(x+2)로 주면 실제로는 x-2~x+1까지 칠해져 가운데가 x-0.5가 되므로 원점 쪽으로 치우친다.
+	//        (x+3)까지 주면 x-2~x+2가 칠해져 가운데가 x에 맞는다. (About Ellipses, Rectangle 함수 문서)
 	Ellipse(hdc, (int)x - 2, (int)y - 2, (int)x + 3, (int)y + 3);
 
 	ReleaseDC(hwnd, hdc);
