@@ -3,23 +3,45 @@
 #endif
 
 #include <windows.h>
+#include <gdiplus.h>
+#include <Eigen/Dense>
+#include <vector>
 
-#define COLOR_BLACK RGB(0, 0, 0)
-#define COLOR_WHITE RGB(255, 255, 255)
-#define COLOR_RED RGB(255, 0, 0)
-#define COLOR_GREEN RGB(0, 255, 0)
-#define COLOR_BLUE RGB(0, 0, 255)
+// 내 이해: Color의 4인자 순서는 R G B A가 아니라 A R G B다
+#define COLOR_BLACK Color(255, 0, 0, 0)
+#define COLOR_WHITE Color(255, 255, 255, 255)
+#define COLOR_RED Color(255, 255, 0, 0)
+#define COLOR_GREEN Color(255, 0, 255, 0)
+#define COLOR_BLUE Color(255, 0, 0, 255)
+
+using namespace Eigen;
+using namespace Gdiplus;
+
+#pragma comment (lib,"Gdiplus.lib")
 
 void Render(HWND hwnd, HDC hdc)
 {
-	// ? : old가 따로 존재하는 이유?
-	// 해결 : 사용 중인 GDI 오브젝트는 DeleteObject 함수를 사용해 메모리를 해제할 수 없음.
-	// 가령 삭제한다고 해도 디폴트가 삭제되는 문제가 발생.
-	// 따라서 DC에 선택된 GDI 오브젝트는 반드시 하나는 존재해야 함.
-	HPEN myPen, oldPen;
-	HBRUSH myBrush, oldBrush;
+	RECT rcClient;
+	GetClientRect(hwnd, &rcClient);
+	int WIDTH = rcClient.right - rcClient.left;
+	int HEIGHT = rcClient.bottom - rcClient.top;
 
-	POINT rectanglePoint[] =
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	const int nMemDC = SaveDC(hdcMem);
+
+	HBITMAP hBitmap = CreateCompatibleBitmap(hdc, WIDTH, HEIGHT);
+	SelectObject(hdcMem, hBitmap);
+
+	Graphics graphics(hdc);
+
+	Pen whitePen(COLOR_WHITE, 1);
+	SolidBrush whiteBrush(COLOR_WHITE);
+	SolidBrush blackBrush(COLOR_BLACK);
+	SolidBrush greenBrush(COLOR_GREEN);
+
+	graphics.FillRectangle(&blackBrush, (int)rcClient.left, (int)rcClient.top, WIDTH, HEIGHT);
+
+	std::vector<Vector2f> vertexBuffer =
 	{
 		{ 100, 100 },
 		{ 100, 200 },
@@ -27,20 +49,29 @@ void Render(HWND hwnd, HDC hdc)
 		{ 200, 100 }
 	};
 
-	// GDI 오브젝트 핸들 선언
-	myPen = CreatePen(PS_SOLID, 1, COLOR_BLACK);
-	oldPen = (HPEN)SelectObject(hdc, myPen);
-	myBrush = CreateSolidBrush(COLOR_WHITE);
-	oldBrush = (HBRUSH)SelectObject(hdc, myBrush);
+	std::vector<Vector3i> indexBuffer =
+	{
+		{0, 1, 2},
+		{0, 2, 3}
+	};
 
-	// 다각형 그리기. 4는 꼭짓점 개수를 의미함
-	Polygon(hdc, rectanglePoint, 4);
+	for (int i = 0; i < indexBuffer.size(); i++)
+	{
+		PointF points[3] =
+		{
+			PointF(vertexBuffer[indexBuffer[i](0)](0),vertexBuffer[indexBuffer[i](0)](1)),
+			PointF(vertexBuffer[indexBuffer[i](1)](0),vertexBuffer[indexBuffer[i](1)](1)),
+			PointF(vertexBuffer[indexBuffer[i](2)](0),vertexBuffer[indexBuffer[i](2)](1))
+		};
 
-	// GDI 오브젝트 메모리 해제
-	SelectObject(hdc, oldPen);
-	SelectObject(hdc, oldBrush);
-	DeleteObject(myPen);
-	DeleteObject(myBrush);
+		// DrawPolygon은 내부를 채우지 않는다.
+		// graphics.DrawPolygon(&whitePen, points, 3);
+		graphics.FillPolygon(&greenBrush, points, 3);
+	}
+
+	RestoreDC(hdcMem, nMemDC);
+	DeleteObject(hBitmap);
+	DeleteDC(hdcMem);
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -74,6 +105,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+	GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR           gdiplusToken;
+
+	// Initialize GDI+.
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
 	// Register the window class.
 	const wchar_t CLASS_NAME[] = L"Sample Window Class";
 
@@ -82,6 +119,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	wc.lpfnWndProc = WindowProc; // 창 프로시저
 	wc.hInstance = hInstance; // 애플리케이션 인스턴스 핸들
 	wc.lpszClassName = CLASS_NAME; // 창 클래스 식별 문자열
+	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 
 	RegisterClass(&wc); // OS에 창 클래스 등록
 
@@ -107,6 +145,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	}
 
 	ShowWindow(hwnd, nCmdShow);
+	UpdateWindow(hwnd);
 
 	// Run the message loop.
 	/*
@@ -122,6 +161,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		DispatchMessage(&msg); // 메세지의 대상인 창의 프로시저를 호출하도록 지시
 	}
 
+	GdiplusShutdown(gdiplusToken);
 	return 0;
 }
 
