@@ -17,6 +17,7 @@
 using namespace Eigen;
 using namespace Gdiplus;
 
+// 내 이해: GDI+는 헤더(gdiplus.h)만 포함하면 링크 오류(LNK2019)가 나므로 Gdiplus.lib을 링크해야 한다
 #pragma comment (lib,"Gdiplus.lib")
 
 void Render(HWND hwnd, HDC hdc)
@@ -39,6 +40,7 @@ void Render(HWND hwnd, HDC hdc)
 	SolidBrush blackBrush(COLOR_BLACK);
 	SolidBrush greenBrush(COLOR_GREEN);
 
+	// 내 이해: LONG(rcClient.left, top)과 unsigned(WIDTH, HEIGHT)를 섞어 넘기면 '오버로드된 함수에 대한 호출이 모호합니다' 오류가 난다. 인자를 전부 int로 맞춰서 해결
 	graphics.FillRectangle(&blackBrush, (int)rcClient.left, (int)rcClient.top, WIDTH, HEIGHT);
 
 	std::vector<Vector2f> vertexBuffer =
@@ -64,7 +66,7 @@ void Render(HWND hwnd, HDC hdc)
 			PointF(vertexBuffer[indexBuffer[i](2)](0),vertexBuffer[indexBuffer[i](2)](1))
 		};
 
-		// DrawPolygon은 내부를 채우지 않는다.
+		// 내 이해: DrawPolygon은 내부를 채우지 않는다.
 		// graphics.DrawPolygon(&whitePen, points, 3);
 		graphics.FillPolygon(&greenBrush, points, 3);
 	}
@@ -105,6 +107,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+	// 내 이해: GDI+를 쓰려면 프로그램 시작 시 GdiplusStartup, 종료 시 GdiplusShutdown을 호출해야 한다
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR           gdiplusToken;
 
