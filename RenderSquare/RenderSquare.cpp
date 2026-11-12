@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <gdiplus.h>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
 #include <vector>
 
 // 내 이해: Color의 4인자 순서는 R G B A가 아니라 A R G B다
@@ -56,6 +57,14 @@ void Render(HWND hwnd, HDC hdc)
 		{0, 1, 2},
 		{0, 2, 3}
 	};
+
+	// 아핀 변환 -> T * R * S * V
+	Transform<float, 2, Affine> t = Translation<float, 2>(100, 100) * Rotation2Df(0.2f)* Scaling(1.5f);
+	for (int i = 0; i < vertexBuffer.size(); i++)
+	{
+		vertexBuffer[i] = t * vertexBuffer[i];
+	}
+
 
 	for (int i = 0; i < indexBuffer.size(); i++)
 	{
