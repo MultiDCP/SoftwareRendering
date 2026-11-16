@@ -471,6 +471,12 @@
   <ItemGroup>
     <ClCompile Include="CubeMain.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Transition.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\..\..\..\Eigen5\debug\msvc\eigen.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -4,9 +4,9 @@
 
 #include <windows.h>
 #include <gdiplus.h>
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
 #include <vector>
+
+#include "Transition.h"
 
 // 내 이해: Color의 4인자 순서는 R G B A가 아니라 A R G B다
 #define COLOR_BLACK Color(255, 0, 0, 0)
@@ -20,6 +20,13 @@ using namespace Gdiplus;
 
 // 내 이해: GDI+는 헤더(gdiplus.h)만 포함하면 링크 오류(LNK2019)가 나므로 Gdiplus.lib을 링크해야 한다
 #pragma comment (lib,"Gdiplus.lib")
+
+Viewport mainViewport;
+float objRotationY = 0, objRotationX = 0;
+Matrix4f worldMatrix, viewMatrix, projMatrix;
+Vector3f camPos(-8, 0, 0);
+Vector3f zeroVector(0, 0, 0);
+Vector3f upVector(0, 1, 0);
 
 void Render(HWND hwnd, HDC hdc)
 {
@@ -44,25 +51,43 @@ void Render(HWND hwnd, HDC hdc)
 	// 내 이해: LONG(rcClient.left, top)과 unsigned(WIDTH, HEIGHT)를 섞어 넘기면 '오버로드된 함수에 대한 호출이 모호합니다' 오류가 난다. 인자를 전부 int로 맞춰서 해결
 	graphics.FillRectangle(&blackBrush, (int)rcClient.left, (int)rcClient.top, WIDTH, HEIGHT);
 
-	std::vector<Vector3f> vertexBuffer =
+	std::vector<Vector4f> vertexBuffer =
 	{
-		{ 100, 100, 0 },
-		{ 100, 200, 0 },
-		{ 200, 200, 0 },
-		{ 200, 100, 0 }
+		{ -1, -1, -1, 1 },	// 0
+		{  1, -1, -1, 1 },	// 1
+		{  1,  1, -1, 1 },	// 2
+		{ -1,  1, -1, 1 },	// 3
+		{ -1, -1,  1, 1 },	// 4
+		{  1, -1,  1, 1 },	// 5
+		{  1,  1,  1, 1 },	// 6
+		{ -1,  1,  1, 1 }	// 7
 	};
 
 	std::vector<Vector3i> indexBuffer =
 	{
-		{0, 1, 2},
-		{0, 2, 3}
+		{0, 3, 2}, {0, 2, 1},	// z = -1
+		{4, 5, 6}, {4, 6, 7},	// z = +1
+		{0, 4, 7}, {0, 7, 3},	// x = -1
+		{1, 2, 6}, {1, 6, 5},	// x = +1
+		{0, 1, 5}, {0, 5, 4},	// y = -1
+		{3, 7, 6}, {3, 6, 2}	// y = +1
 	};
 
+	std::vector<Vector4f> main_pixel_buffer;
+	mainViewport.Update(0, 0, WIDTH, HEIGHT);
+
+	viewMatrix = LootAtTransition(camPos, zeroVector, upVector);
+	projMatrix = PerspectiveFovTransition(DegToRad(60), float(WIDTH) / float(HEIGHT), 1, 10);
+
 	// 아핀 변환 -> T * R * S * V
-	Transform<float, 3, Affine> t = Translation<float, 3>(0, 0, 0) * AngleAxisf(0.3f, Vector3f(0, 0, 1)) * Scaling(1.f);
+	Transform<float, 3, Affine> t = Translation<float, 3>(0, 0, 0) * (AngleAxisf(objRotationY, Vector3f::UnitY()) * AngleAxisf(objRotationX, Vector3f::UnitX())) * Scaling(1.f);
+	worldMatrix = t.matrix();
+
+	Matrix4f multMatrix = projMatrix * viewMatrix * worldMatrix;
+	main_pixel_buffer.clear();
 	for (int i = 0; i < vertexBuffer.size(); i++)
 	{
-		vertexBuffer[i] = t * vertexBuffer[i];
+		main_pixel_buffer.push_back(ProjectTransition(vertexBuffer[i], mainViewport, multMatrix));
 	}
 
 
@@ -70,9 +95,9 @@ void Render(HWND hwnd, HDC hdc)
 	{
 		PointF points[3] =
 		{
-			PointF(vertexBuffer[indexBuffer[i](0)](0),vertexBuffer[indexBuffer[i](0)](1)),
-			PointF(vertexBuffer[indexBuffer[i](1)](0),vertexBuffer[indexBuffer[i](1)](1)),
-			PointF(vertexBuffer[indexBuffer[i](2)](0),vertexBuffer[indexBuffer[i](2)](1))
+			PointF(main_pixel_buffer[indexBuffer[i](0)](0),main_pixel_buffer[indexBuffer[i](0)](1)),
+			PointF(main_pixel_buffer[indexBuffer[i](1)](0),main_pixel_buffer[indexBuffer[i](1)](1)),
+			PointF(main_pixel_buffer[indexBuffer[i](2)](0),main_pixel_buffer[indexBuffer[i](2)](1))
 		};
 
 		// 내 이해: DrawPolygon은 내부를 채우지 않는다.
@@ -97,6 +122,35 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		return 0;
+
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case VK_RIGHT:
+			objRotationY += 0.02f;
+			break;
+		case VK_LEFT:
+			objRotationY -= 0.02f;
+			break;
+		case VK_UP:
+			objRotationX += 0.02f;
+			break;
+		case VK_DOWN:
+			objRotationX -= 0.02f;
+			break;
+		case VK_RETURN:
+			objRotationX = 0.f;
+			objRotationY = 0.f;
+			break;
+		}
+		InvalidateRect(hwnd, NULL, FALSE);
+		UpdateWindow(hwnd);
+		return 0;
+
+	case WM_SIZE:
+		InvalidateRect(hwnd, NULL, FALSE);
+		UpdateWindow(hwnd);
 		return 0;
 
 	case WM_PAINT:
