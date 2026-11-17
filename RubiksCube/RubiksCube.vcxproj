@@ -472,6 +472,7 @@
     <ClCompile Include="CubeMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RubiksCubeMesh.h" />
     <ClInclude Include="Transition.h" />
   </ItemGroup>
   <ItemGroup>
