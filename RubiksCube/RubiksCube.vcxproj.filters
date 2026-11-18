@@ -26,6 +26,9 @@
     <ClInclude Include="RubiksCubeMesh.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CubeLogic.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\..\..\..\..\Eigen5\debug\msvc\eigen.natvis" />

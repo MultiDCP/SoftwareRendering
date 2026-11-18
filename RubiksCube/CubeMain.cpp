@@ -8,6 +8,7 @@
 
 #include "Transition.h"
 #include "RubiksCubeMesh.h"
+#include "CubeLogic.h"
 
 // 내 이해: Color의 4인자 순서는 R G B A가 아니라 A R G B다
 #define COLOR_BLACK Color(255, 0, 0, 0)
@@ -59,6 +60,7 @@ void Render(HWND hwnd, HDC hdc)
 	Graphics graphics(hdcMem);
 
 	Pen whitePen(COLOR_WHITE, 1);
+	Pen blackPen(COLOR_BLACK, 1);
 	SolidBrush whiteBrush(COLOR_WHITE);
 	SolidBrush blackBrush(COLOR_BLACK);
 	SolidBrush greenBrush(COLOR_GREEN);
@@ -130,26 +132,66 @@ void Render(HWND hwnd, HDC hdc)
 		if (isRenderTarget[i] == true)
 		{
 			int surfaceNum = i / 18;
-			switch (surfaceNum)
+			int faceNum = (i % 18) / 2;
+
+			ESurface surface = (ESurface)surfaceNum;
+			char color;
+
+			switch(surfaceNum)
 			{
-				case 0:
+				case Left:
+					color = L_arr[faceNum / 3][faceNum % 3];
+					break;
+				case Right:
+					color = R_arr[faceNum / 3][faceNum % 3];
+					break;
+				case Front:
+					color = F_arr[faceNum / 3][faceNum % 3];
+					break;
+				case Back:
+					color = B_arr[faceNum / 3][faceNum % 3];
+					break;
+				case Down:
+					color = D_arr[faceNum / 3][faceNum % 3];
+					break;
+				case Up:
+					color = U_arr[faceNum / 3][faceNum % 3];
+					break;
+			}
+
+			switch (color)
+			{
+				case 'O':
 					graphics.FillPolygon(&orangeBrush, points, 3);
 					break;
-				case 1:
+				case 'R':
 					graphics.FillPolygon(&redBrush, points, 3);
 					break;
-				case 2:
+				case 'G':
 					graphics.FillPolygon(&greenBrush, points, 3);
 					break;
-				case 3:
+				case 'B':
 					graphics.FillPolygon(&blueBrush, points, 3);
 					break;
-				case 4:
+				case 'Y':
 					graphics.FillPolygon(&yellowBrush, points, 3);
 					break;
-				case 5:
+				case 'W':
 					graphics.FillPolygon(&whiteBrush, points, 3);
 					break;
+			}
+		}
+	}
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (isRenderTarget[i * 18] == true)
+		{
+			for (int j = i * 8; j < (i + 1) * 8; j++)
+			{
+				graphics.DrawLine(&blackPen,
+					main_pixel_buffer[rubiksLineIndexBuffer[j](0)](0), main_pixel_buffer[rubiksLineIndexBuffer[j](0)](1),
+					main_pixel_buffer[rubiksLineIndexBuffer[j](1)](0), main_pixel_buffer[rubiksLineIndexBuffer[j](1)](1));
 			}
 		}
 	}
@@ -197,6 +239,24 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case VK_RETURN:
 			objRotationX = 0.f;
 			objRotationY = 0.f;
+			break;
+		case 'L':
+			L_Clockwise();
+			break;
+		case 'R':
+			R_Clockwise();
+			break;
+		case 'F':
+			F_Clockwise();
+			break;
+		case 'B':
+			B_Clockwise();
+			break;
+		case 'U':
+			U_Clockwise();
+			break;
+		case 'D':
+			D_Clockwise();
 			break;
 		}
 		InvalidateRect(hwnd, NULL, FALSE);
