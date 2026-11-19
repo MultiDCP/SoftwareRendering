@@ -1,4 +1,4 @@
-#ifndef UNICODE
+ï»¿#ifndef UNICODE
 #define UNICODE
 #endif
 
@@ -10,7 +10,7 @@
 #include "RubiksCubeMesh.h"
 #include "CubeLogic.h"
 
-// ³» ÀÌÇØ: ColorÀÇ 4ÀÎÀÚ ¼ø¼­´Â R G B A°¡ ¾Æ´Ï¶ó A R G B´Ù
+// ë‚´ ì´í•´: Colorì˜ 4ì¸ì ìˆœì„œëŠ” R G B Aê°€ ì•„ë‹ˆë¼ A R G Bë‹¤
 #define COLOR_BLACK Color(255, 0, 0, 0)
 #define COLOR_WHITE Color(255, 255, 255, 255)
 #define COLOR_RED Color(255, 255, 0, 0)
@@ -22,7 +22,7 @@
 using namespace Eigen;
 using namespace Gdiplus;
 
-// ³» ÀÌÇØ: GDI+´Â Çì´õ(gdiplus.h)¸¸ Æ÷ÇÔÇÏ¸é ¸µÅ© ¿À·ù(LNK2019)°¡ ³ª¹Ç·Î Gdiplus.libÀ» ¸µÅ©ÇØ¾ß ÇÑ´Ù
+// ë‚´ ì´í•´: GDI+ëŠ” í—¤ë”(gdiplus.h)ë§Œ í¬í•¨í•˜ë©´ ë§í¬ ì˜¤ë¥˜(LNK2019)ê°€ ë‚˜ë¯€ë¡œ Gdiplus.libì„ ë§í¬í•´ì•¼ í•œë‹¤
 #pragma comment (lib,"Gdiplus.lib")
 
 unsigned WIDTH = 500;
@@ -46,17 +46,17 @@ void Render(HWND hwnd, HDC hdc)
 	WIDTH = rcClient.right - rcClient.left;
 	HEIGHT = rcClient.bottom - rcClient.top;
 
-	// ¸Ş¸ğ¸® DC »ı¼º
+	// ë©”ëª¨ë¦¬ DC ìƒì„±
 	HDC hdcMem = CreateCompatibleDC(hdc);
 	const int nMemDC = SaveDC(hdcMem);
 
-	// È£È¯ ºñÆ®¸Ê »ı¼º
+	// í˜¸í™˜ ë¹„íŠ¸ë§µ ìƒì„±
 	HBITMAP hBitmap = CreateCompatibleBitmap(hdc, WIDTH, HEIGHT);
 
-	// ¸Ş¸ğ¸® DC¿¡ ºñÆ®¸Ê ¼±ÅÃ
+	// ë©”ëª¨ë¦¬ DCì— ë¹„íŠ¸ë§µ ì„ íƒ
 	SelectObject(hdcMem, hBitmap);
 
-	// ÀÌÈÄ ¸Ş¸ğ¸® DC¿¡ ¹è°æ ¹× ±×¸² ±×¸®±â
+	// ì´í›„ ë©”ëª¨ë¦¬ DCì— ë°°ê²½ ë° ê·¸ë¦¼ ê·¸ë¦¬ê¸°
 	Graphics graphics(hdcMem);
 
 	Pen whitePen(COLOR_WHITE, 1);
@@ -69,7 +69,7 @@ void Render(HWND hwnd, HDC hdc)
 	SolidBrush yellowBrush(COLOR_YELLOW);
 	SolidBrush orangeBrush(COLOR_ORANGE);
 
-	// ³» ÀÌÇØ: LONG(rcClient.left, top)°ú unsigned(WIDTH, HEIGHT)¸¦ ¼¯¾î ³Ñ±â¸é '¿À¹ö·ÎµåµÈ ÇÔ¼ö¿¡ ´ëÇÑ È£ÃâÀÌ ¸ğÈ£ÇÕ´Ï´Ù' ¿À·ù°¡ ³­´Ù. ÀÎÀÚ¸¦ ÀüºÎ int·Î ¸ÂÃç¼­ ÇØ°á
+	// ë‚´ ì´í•´: LONG(rcClient.left, top)ê³¼ unsigned(WIDTH, HEIGHT)ë¥¼ ì„ì–´ ë„˜ê¸°ë©´ 'ì˜¤ë²„ë¡œë“œëœ í•¨ìˆ˜ì— ëŒ€í•œ í˜¸ì¶œì´ ëª¨í˜¸í•©ë‹ˆë‹¤' ì˜¤ë¥˜ê°€ ë‚œë‹¤. ì¸ìë¥¼ ì „ë¶€ intë¡œ ë§ì¶°ì„œ í•´ê²°
 	graphics.FillRectangle(&blackBrush, (int)rcClient.left, (int)rcClient.top, WIDTH, HEIGHT);
 
 	mainViewport.Update(0, 0, WIDTH, HEIGHT);
@@ -77,27 +77,27 @@ void Render(HWND hwnd, HDC hdc)
 	viewMatrix = LootAtTransition(camPos, zeroVector, upVector);
 	projMatrix = PerspectiveFovTransition(DegToRad(60), float(WIDTH) / float(HEIGHT), 1, 10);
 
-	// ¾ÆÇÉ º¯È¯ -> T * R * S * V
+	// ì•„í•€ ë³€í™˜ -> T * R * S * V
 	Transform<float, 3, Affine> t = Translation<float, 3>(0, 0, 0) * (AngleAxisf(objRotationY, Vector3f::UnitY()) * AngleAxisf(objRotationX, Vector3f::UnitX())) * Scaling(1.f);
 	worldMatrix = t.matrix();
 
-	// ¹éÆäÀÌ½º ÄÃ¸µÀ» À§ÇØ ºä °ø°£ º¯È¯ Çà·ÄÀ» µû·Î ¸¸µé¾îµĞ´Ù.
+	// ë°±í˜ì´ìŠ¤ ì»¬ë§ì„ ìœ„í•´ ë·° ê³µê°„ ë³€í™˜ í–‰ë ¬ì„ ë”°ë¡œ ë§Œë“¤ì–´ë‘”ë‹¤.
 	Matrix4f viewTransMatrix = viewMatrix * worldMatrix;
 
 	viewVertex.clear();
 	isRenderTarget.clear();
 
-	// ºä °ø°£¿¡¼­ÀÇ Á¤Á¡ ÁÂÇ¥¸¦ µû·Î °è»êÇÏ¿© ÀúÀåÇÑ´Ù.
+	// ë·° ê³µê°„ì—ì„œì˜ ì •ì  ì¢Œí‘œë¥¼ ë”°ë¡œ ê³„ì‚°í•˜ì—¬ ì €ì¥í•œë‹¤.
 	for (int i = 0; i < rubiksVertexBuffer.size(); i++)
 	{
 		Vector4f newV = viewTransMatrix * rubiksVertexBuffer[i];
 		viewVertex.push_back(newV);
 	}
 
-	// ¹ı¼±À» ±¸ÇÑ µÚ Ä«¸Ş¶ó¿¡¼­ ¸éÀ» ÇâÇÏ´Â º¤ÅÍ¿Í ³»ÀûÀ» ¼öÇàÇÏ¿© ¹éÆäÀÌ½º ÄÃ¸µÀ» °è»êÇÑ´Ù.
-	// Claude ¼³¸í : ºä °ø°£¿¡¼­´Â Ä«¸Ş¶ó°¡ ¿øÁ¡¿¡ ÀÖ±â¿¡ v0 ±×´ë·Î »ç¿ëÇÑ´Ù.
-	// °íÁ¤µÈ ½Ã¼± ¹æÇâÀ¸·Î¸¸ ÆÇ´ÜÇÏ´Â ¹æ½ÄÀº Á÷±³ Åõ¿µ¿¡¼­¸¸ ¸ÂÀ¸¸ç,
-	// ¿ø±Ù Åõ¿µ¿¡¼­´Â È­¸é °¡ÀåÀÚ¸®¿¡ ÀÖ´Â ¸éÀÏ¼ö·Ï "Ä«¸Ş¶ó¿¡¼­ ¸éÀ» ÇâÇÑ ¹æÇâ"ÀÌ ½Ã¼± ¹æÇâ°ú ´Ş¶óÁø´Ù.
+	// ë²•ì„ ì„ êµ¬í•œ ë’¤ ì¹´ë©”ë¼ì—ì„œ ë©´ì„ í–¥í•˜ëŠ” ë²¡í„°ì™€ ë‚´ì ì„ ìˆ˜í–‰í•˜ì—¬ ë°±í˜ì´ìŠ¤ ì»¬ë§ì„ ê³„ì‚°í•œë‹¤.
+	// Claude ì„¤ëª… : ë·° ê³µê°„ì—ì„œëŠ” ì¹´ë©”ë¼ê°€ ì›ì ì— ìˆê¸°ì— v0 ê·¸ëŒ€ë¡œ ì‚¬ìš©í•œë‹¤.
+	// ê³ ì •ëœ ì‹œì„  ë°©í–¥ìœ¼ë¡œë§Œ íŒë‹¨í•˜ëŠ” ë°©ì‹ì€ ì§êµ íˆ¬ì˜ì—ì„œë§Œ ë§ìœ¼ë©°,
+	// ì›ê·¼ íˆ¬ì˜ì—ì„œëŠ” í™”ë©´ ê°€ì¥ìë¦¬ì— ìˆëŠ” ë©´ì¼ìˆ˜ë¡ "ì¹´ë©”ë¼ì—ì„œ ë©´ì„ í–¥í•œ ë°©í–¥"ì´ ì‹œì„  ë°©í–¥ê³¼ ë‹¬ë¼ì§„ë‹¤.
 	for (int i = 0; i < rubiksIndexBuffer.size(); i++)
 	{
 		Vector4f v0 = viewVertex[rubiksIndexBuffer[i](0)];
@@ -107,10 +107,10 @@ void Render(HWND hwnd, HDC hdc)
 		Vector4f v1_0 = v1 - v0;
 		Vector4f v2_0 = v2 - v0;
 
-		// cross´Â Å©±â°¡ 3ÀÎ º¤ÅÍ¿¡¼­¸¸ ¾µ ¼ö ÀÖ´Ù. cross3Àº Vector4fµµ »ç¿ëÇÒ ¼ö ÀÖÀ¸¸ç, ¾ÕÀÇ ¼¼ ¼ººĞÀ¸·Î¸¸ ¿ÜÀûÀ» °è»êÇÑ´Ù.
+		// crossëŠ” í¬ê¸°ê°€ 3ì¸ ë²¡í„°ì—ì„œë§Œ ì“¸ ìˆ˜ ìˆë‹¤. cross3ì€ Vector4fë„ ì‚¬ìš©í•  ìˆ˜ ìˆìœ¼ë©°, ì•ì˜ ì„¸ ì„±ë¶„ìœ¼ë¡œë§Œ ì™¸ì ì„ ê³„ì‚°í•œë‹¤.
 		Vector4f n = v1_0.cross3(v2_0);
 		
-		// ¾Õ¸éÀÎ °æ¿ì ·»´õ¸µÀ» ¼öÇàÇÏ¸ç, ¾Æ´Ò °æ¿ì ·»´õÇÏÁö ¾Ê´Â´Ù.
+		// ì•ë©´ì¸ ê²½ìš° ë Œë”ë§ì„ ìˆ˜í–‰í•˜ë©°, ì•„ë‹ ê²½ìš° ë Œë”í•˜ì§€ ì•ŠëŠ”ë‹¤.
 		n.dot(v0) < 0 ? isRenderTarget.push_back(true) : isRenderTarget.push_back(false);
 	}
 
@@ -196,12 +196,12 @@ void Render(HWND hwnd, HDC hdc)
 		}
 	}
 
-	// ¸Ş¸ğ¸® DC ³»¿ëÀ» ½ÇÁ¦ È­¸é DC·Î º¹»ç
+	// ë©”ëª¨ë¦¬ DC ë‚´ìš©ì„ ì‹¤ì œ í™”ë©´ DCë¡œ ë³µì‚¬
 	RECT rcClip;
 	GetClipBox(hdc, &rcClip);
 	BitBlt(hdc, rcClip.left, rcClip.top, rcClip.right - rcClip.left, rcClip.bottom - rcClip.top, hdcMem, rcClip.left, rcClip.top, SRCCOPY);
 
-	// ¸Ş¸ğ¸® ÀÚ¿ø ÇØÁ¦
+	// ë©”ëª¨ë¦¬ ìì› í•´ì œ
 	RestoreDC(hdcMem, nMemDC);
 	DeleteObject(hBitmap);
 	DeleteDC(hdcMem);
@@ -209,7 +209,7 @@ void Render(HWND hwnd, HDC hdc)
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// uMsg : ¸Ş¼¼Áö ÄÚµå. wParam°ú lParamÀ» ÅëÇØ ÇÔ¼ö°¡ °ü·ÃµÈ Ãß°¡ µ¥ÀÌÅÍ¸¦ ¹ŞÀ» ¼ö ÀÖ´Ù.
+	// uMsg : ë©”ì„¸ì§€ ì½”ë“œ. wParamê³¼ lParamì„ í†µí•´ í•¨ìˆ˜ê°€ ê´€ë ¨ëœ ì¶”ê°€ ë°ì´í„°ë¥¼ ë°›ì„ ìˆ˜ ìˆë‹¤.
 	switch (uMsg)
 	{
 	case WM_CLOSE:
@@ -278,13 +278,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 	}
-	// Æ¯Á¤ ¸Ş¼¼Áö¸¦ Ã³¸®ÇÏÁö ¾Ê´Â °æ¿ì ±âº» ÀÛ¾÷ ¼öÇà
+	// íŠ¹ì • ë©”ì„¸ì§€ë¥¼ ì²˜ë¦¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° ê¸°ë³¸ ì‘ì—… ìˆ˜í–‰
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	// ³» ÀÌÇØ: GDI+¸¦ ¾²·Á¸é ÇÁ·Î±×·¥ ½ÃÀÛ ½Ã GdiplusStartup, Á¾·á ½Ã GdiplusShutdownÀ» È£ÃâÇØ¾ß ÇÑ´Ù
+	// ë‚´ ì´í•´: GDI+ë¥¼ ì“°ë ¤ë©´ í”„ë¡œê·¸ë¨ ì‹œì‘ ì‹œ GdiplusStartup, ì¢…ë£Œ ì‹œ GdiplusShutdownì„ í˜¸ì¶œí•´ì•¼ í•œë‹¤
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR           gdiplusToken;
 
@@ -296,18 +296,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	WNDCLASS wc = { };
 
-	wc.lpfnWndProc = WindowProc; // Ã¢ ÇÁ·Î½ÃÀú
-	wc.hInstance = hInstance; // ¾ÖÇÃ¸®ÄÉÀÌ¼Ç ÀÎ½ºÅÏ½º ÇÚµé
-	wc.lpszClassName = CLASS_NAME; // Ã¢ Å¬·¡½º ½Äº° ¹®ÀÚ¿­
+	wc.lpfnWndProc = WindowProc; // ì°½ í”„ë¡œì‹œì €
+	wc.hInstance = hInstance; // ì• í”Œë¦¬ì¼€ì´ì…˜ ì¸ìŠ¤í„´ìŠ¤ í•¸ë“¤
+	wc.lpszClassName = CLASS_NAME; // ì°½ í´ë˜ìŠ¤ ì‹ë³„ ë¬¸ìì—´
 	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 
-	RegisterClass(&wc); // OS¿¡ Ã¢ Å¬·¡½º µî·Ï
+	RegisterClass(&wc); // OSì— ì°½ í´ë˜ìŠ¤ ë“±ë¡
 
 	// Create the window.
 	HWND hwnd = CreateWindowEx(
 		0,								// Optional window styles.
 		CLASS_NAME,						// Window class
-		L"Rubiks Cube Rendering",		// Window text (Ã¢ ÀÌ¸§ÀÌ µÈ´Ù)
+		L"Rubiks Cube Rendering",		// Window text (ì°½ ì´ë¦„ì´ ëœë‹¤)
 		WS_OVERLAPPEDWINDOW,			// Window style
 
 		// Size and position
@@ -329,16 +329,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	// Run the message loop.
 	/*
-	* ¾ÖÇÃ¸®ÄÉÀÌ¼ÇÀº ½ÇÇàµÇ´Â µ¿¾È ¼öÃµ °³ÀÇ ¸Ş¼¼Áö¸¦ ¹ŞÀ½
-	* °¢ ¾ÛÀº ³¯¾Æ¿À´Â ¼öÃµ°³ÀÇ ¸Ş¼¼Áö Áß ÀÚ±â ²¨¸¦ °Ë»öÇÏ°í
-	* ¿Ã¹Ù¸¥ Ã¢À¸·Î µğ½ºÆĞÄ¡ÇÏ´Â ·çÇÁ°¡ ÇÊ¿äÇÔ
+	* ì• í”Œë¦¬ì¼€ì´ì…˜ì€ ì‹¤í–‰ë˜ëŠ” ë™ì•ˆ ìˆ˜ì²œ ê°œì˜ ë©”ì„¸ì§€ë¥¼ ë°›ìŒ
+	* ê° ì•±ì€ ë‚ ì•„ì˜¤ëŠ” ìˆ˜ì²œê°œì˜ ë©”ì„¸ì§€ ì¤‘ ìê¸° êº¼ë¥¼ ê²€ìƒ‰í•˜ê³ 
+	* ì˜¬ë°”ë¥¸ ì°½ìœ¼ë¡œ ë””ìŠ¤íŒ¨ì¹˜í•˜ëŠ” ë£¨í”„ê°€ í•„ìš”í•¨
 	*/
 
 	MSG msg = { };
-	while (GetMessage(&msg, NULL, 0, 0) > 0) // Å¥¿¡¼­ ¸Ş¼¼Áö¸¦ ²ø¾î¿È
+	while (GetMessage(&msg, NULL, 0, 0) > 0) // íì—ì„œ ë©”ì„¸ì§€ë¥¼ ëŒì–´ì˜´
 	{
 		TranslateMessage(&msg);
-		DispatchMessage(&msg); // ¸Ş¼¼ÁöÀÇ ´ë»óÀÎ Ã¢ÀÇ ÇÁ·Î½ÃÀú¸¦ È£ÃâÇÏµµ·Ï Áö½Ã
+		DispatchMessage(&msg); // ë©”ì„¸ì§€ì˜ ëŒ€ìƒì¸ ì°½ì˜ í”„ë¡œì‹œì €ë¥¼ í˜¸ì¶œí•˜ë„ë¡ ì§€ì‹œ
 	}
 
 	GdiplusShutdown(gdiplusToken);

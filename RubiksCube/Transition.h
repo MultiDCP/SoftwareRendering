@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
@@ -31,7 +31,7 @@ struct Viewport
 
 Matrix4f LootAtTransition(Vector3f eye, Vector3f at, Vector3f up)
 {
-	// normalize : Á÷Á¢ ¼öÁ¤, normalized : »õ °´Ã¼ ¹İÈ¯
+	// normalize : ì§ì ‘ ìˆ˜ì •, normalized : ìƒˆ ê°ì²´ ë°˜í™˜
 	Vector3f zaxis = Vector3f(eye - at).normalized();
 	Vector3f xaxis = up.cross(zaxis).normalized();
 	Vector3f yaxis = zaxis.cross(xaxis);

@@ -1,4 +1,4 @@
-#ifndef UNICODE
+ï»¿#ifndef UNICODE
 #define UNICODE
 #endif
 
@@ -8,7 +8,7 @@
 #include <Eigen/Geometry>
 #include <vector>
 
-// ³» ÀÌÇØ: ColorÀÇ 4ÀÎÀÚ ¼ø¼­´Â R G B A°¡ ¾Æ´Ï¶ó A R G B´Ù
+// ë‚´ ì´í•´: Colorì˜ 4ì¸ì ìˆœì„œëŠ” R G B Aê°€ ì•„ë‹ˆë¼ A R G Bë‹¤
 #define COLOR_BLACK Color(255, 0, 0, 0)
 #define COLOR_WHITE Color(255, 255, 255, 255)
 #define COLOR_RED Color(255, 255, 0, 0)
@@ -18,7 +18,7 @@
 using namespace Eigen;
 using namespace Gdiplus;
 
-// ³» ÀÌÇØ: GDI+´Â Çì´õ(gdiplus.h)¸¸ Æ÷ÇÔÇÏ¸é ¸µÅ© ¿À·ù(LNK2019)°¡ ³ª¹Ç·Î Gdiplus.libÀ» ¸µÅ©ÇØ¾ß ÇÑ´Ù
+// ë‚´ ì´í•´: GDI+ëŠ” í—¤ë”(gdiplus.h)ë§Œ í¬í•¨í•˜ë©´ ë§í¬ ì˜¤ë¥˜(LNK2019)ê°€ ë‚˜ë¯€ë¡œ Gdiplus.libì„ ë§í¬í•´ì•¼ í•œë‹¤
 #pragma comment (lib,"Gdiplus.lib")
 
 void Render(HWND hwnd, HDC hdc)
@@ -41,7 +41,7 @@ void Render(HWND hwnd, HDC hdc)
 	SolidBrush blackBrush(COLOR_BLACK);
 	SolidBrush greenBrush(COLOR_GREEN);
 
-	// ³» ÀÌÇØ: LONG(rcClient.left, top)°ú unsigned(WIDTH, HEIGHT)¸¦ ¼¯¾î ³Ñ±â¸é '¿À¹ö·ÎµåµÈ ÇÔ¼ö¿¡ ´ëÇÑ È£ÃâÀÌ ¸ğÈ£ÇÕ´Ï´Ù' ¿À·ù°¡ ³­´Ù. ÀÎÀÚ¸¦ ÀüºÎ int·Î ¸ÂÃç¼­ ÇØ°á
+	// ë‚´ ì´í•´: LONG(rcClient.left, top)ê³¼ unsigned(WIDTH, HEIGHT)ë¥¼ ì„ì–´ ë„˜ê¸°ë©´ 'ì˜¤ë²„ë¡œë“œëœ í•¨ìˆ˜ì— ëŒ€í•œ í˜¸ì¶œì´ ëª¨í˜¸í•©ë‹ˆë‹¤' ì˜¤ë¥˜ê°€ ë‚œë‹¤. ì¸ìë¥¼ ì „ë¶€ intë¡œ ë§ì¶°ì„œ í•´ê²°
 	graphics.FillRectangle(&blackBrush, (int)rcClient.left, (int)rcClient.top, WIDTH, HEIGHT);
 
 	std::vector<Vector2f> vertexBuffer =
@@ -58,7 +58,7 @@ void Render(HWND hwnd, HDC hdc)
 		{0, 2, 3}
 	};
 
-	// ¾ÆÇÉ º¯È¯ -> T * R * S * V
+	// ì•„í•€ ë³€í™˜ -> T * R * S * V
 	Transform<float, 2, Affine> t = Translation<float, 2>(100, 100) * Rotation2Df(0.2f)* Scaling(1.5f);
 	for (int i = 0; i < vertexBuffer.size(); i++)
 	{
@@ -75,7 +75,7 @@ void Render(HWND hwnd, HDC hdc)
 			PointF(vertexBuffer[indexBuffer[i](2)](0),vertexBuffer[indexBuffer[i](2)](1))
 		};
 
-		// ³» ÀÌÇØ: DrawPolygonÀº ³»ºÎ¸¦ Ã¤¿ìÁö ¾Ê´Â´Ù.
+		// ë‚´ ì´í•´: DrawPolygonì€ ë‚´ë¶€ë¥¼ ì±„ìš°ì§€ ì•ŠëŠ”ë‹¤.
 		// graphics.DrawPolygon(&whitePen, points, 3);
 		graphics.FillPolygon(&greenBrush, points, 3);
 	}
@@ -87,7 +87,7 @@ void Render(HWND hwnd, HDC hdc)
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// uMsg : ¸Ş¼¼Áö ÄÚµå. wParam°ú lParamÀ» ÅëÇØ ÇÔ¼ö°¡ °ü·ÃµÈ Ãß°¡ µ¥ÀÌÅÍ¸¦ ¹ŞÀ» ¼ö ÀÖ´Ù.
+	// uMsg : ë©”ì„¸ì§€ ì½”ë“œ. wParamê³¼ lParamì„ í†µí•´ í•¨ìˆ˜ê°€ ê´€ë ¨ëœ ì¶”ê°€ ë°ì´í„°ë¥¼ ë°›ì„ ìˆ˜ ìˆë‹¤.
 	switch (uMsg)
 	{
 	case WM_CLOSE:
@@ -110,13 +110,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 	}
-	// Æ¯Á¤ ¸Ş¼¼Áö¸¦ Ã³¸®ÇÏÁö ¾Ê´Â °æ¿ì ±âº» ÀÛ¾÷ ¼öÇà
+	// íŠ¹ì • ë©”ì„¸ì§€ë¥¼ ì²˜ë¦¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° ê¸°ë³¸ ì‘ì—… ìˆ˜í–‰
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	// ³» ÀÌÇØ: GDI+¸¦ ¾²·Á¸é ÇÁ·Î±×·¥ ½ÃÀÛ ½Ã GdiplusStartup, Á¾·á ½Ã GdiplusShutdownÀ» È£ÃâÇØ¾ß ÇÑ´Ù
+	// ë‚´ ì´í•´: GDI+ë¥¼ ì“°ë ¤ë©´ í”„ë¡œê·¸ë¨ ì‹œì‘ ì‹œ GdiplusStartup, ì¢…ë£Œ ì‹œ GdiplusShutdownì„ í˜¸ì¶œí•´ì•¼ í•œë‹¤
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR           gdiplusToken;
 
@@ -128,18 +128,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	WNDCLASS wc = { };
 
-	wc.lpfnWndProc = WindowProc; // Ã¢ ÇÁ·Î½ÃÀú
-	wc.hInstance = hInstance; // ¾ÖÇÃ¸®ÄÉÀÌ¼Ç ÀÎ½ºÅÏ½º ÇÚµé
-	wc.lpszClassName = CLASS_NAME; // Ã¢ Å¬·¡½º ½Äº° ¹®ÀÚ¿­
+	wc.lpfnWndProc = WindowProc; // ì°½ í”„ë¡œì‹œì €
+	wc.hInstance = hInstance; // ì• í”Œë¦¬ì¼€ì´ì…˜ ì¸ìŠ¤í„´ìŠ¤ í•¸ë“¤
+	wc.lpszClassName = CLASS_NAME; // ì°½ í´ë˜ìŠ¤ ì‹ë³„ ë¬¸ìì—´
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 
-	RegisterClass(&wc); // OS¿¡ Ã¢ Å¬·¡½º µî·Ï
+	RegisterClass(&wc); // OSì— ì°½ í´ë˜ìŠ¤ ë“±ë¡
 
 	// Create the window.
 	HWND hwnd = CreateWindowEx(
 		0,								// Optional window styles.
 		CLASS_NAME,						// Window class
-		L"Learn to Program Windows",	// Window text (Ã¢ ÀÌ¸§ÀÌ µÈ´Ù)
+		L"Learn to Program Windows",	// Window text (ì°½ ì´ë¦„ì´ ëœë‹¤)
 		WS_OVERLAPPEDWINDOW,			// Window style
 
 		// Size and position
@@ -161,16 +161,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	// Run the message loop.
 	/*
-	* ¾ÖÇÃ¸®ÄÉÀÌ¼ÇÀº ½ÇÇàµÇ´Â µ¿¾È ¼öÃµ °³ÀÇ ¸Ş¼¼Áö¸¦ ¹ŞÀ½
-	* °¢ ¾ÛÀº ³¯¾Æ¿À´Â ¼öÃµ°³ÀÇ ¸Ş¼¼Áö Áß ÀÚ±â ²¨¸¦ °Ë»öÇÏ°í
-	* ¿Ã¹Ù¸¥ Ã¢À¸·Î µğ½ºÆĞÄ¡ÇÏ´Â ·çÇÁ°¡ ÇÊ¿äÇÔ
+	* ì• í”Œë¦¬ì¼€ì´ì…˜ì€ ì‹¤í–‰ë˜ëŠ” ë™ì•ˆ ìˆ˜ì²œ ê°œì˜ ë©”ì„¸ì§€ë¥¼ ë°›ìŒ
+	* ê° ì•±ì€ ë‚ ì•„ì˜¤ëŠ” ìˆ˜ì²œê°œì˜ ë©”ì„¸ì§€ ì¤‘ ìê¸° êº¼ë¥¼ ê²€ìƒ‰í•˜ê³ 
+	* ì˜¬ë°”ë¥¸ ì°½ìœ¼ë¡œ ë””ìŠ¤íŒ¨ì¹˜í•˜ëŠ” ë£¨í”„ê°€ í•„ìš”í•¨
 	*/
 
 	MSG msg = { };
-	while (GetMessage(&msg, NULL, 0, 0) > 0) // Å¥¿¡¼­ ¸Ş¼¼Áö¸¦ ²ø¾î¿È
+	while (GetMessage(&msg, NULL, 0, 0) > 0) // íì—ì„œ ë©”ì„¸ì§€ë¥¼ ëŒì–´ì˜´
 	{
 		TranslateMessage(&msg);
-		DispatchMessage(&msg); // ¸Ş¼¼ÁöÀÇ ´ë»óÀÎ Ã¢ÀÇ ÇÁ·Î½ÃÀú¸¦ È£ÃâÇÏµµ·Ï Áö½Ã
+		DispatchMessage(&msg); // ë©”ì„¸ì§€ì˜ ëŒ€ìƒì¸ ì°½ì˜ í”„ë¡œì‹œì €ë¥¼ í˜¸ì¶œí•˜ë„ë¡ ì§€ì‹œ
 	}
 
 	GdiplusShutdown(gdiplusToken);
